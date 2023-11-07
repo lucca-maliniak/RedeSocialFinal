@@ -29,20 +29,22 @@ public class ConexaoBD {
     }
 
     public void addUsuario(String nomeInput, String emailInput, String senhaInput) throws Exception {
-        int contadorUser = 1;
         try{
             Connection conexao = DriverManager.getConnection(url, usuario, senha);
             Statement statement = conexao.createStatement();
+
+            String queryMax = "SELECT MAX(COD_USUARIO) FROM USUARIOS";
+            ResultSet resultSet = statement.executeQuery(queryMax);
+            int contadorUser = resultSet.getInt(1) + 1;
+
             String query = "INSERT INTO USUARIOS(COD_USUARIO, NOME, EMAIL, SENHA) VALUES (" + contadorUser + "," + "'" + nomeInput + "'" +  "," + "'" + emailInput + "'" + "," + "'" + senhaInput + "'" + ")";
-            resul = statement.executeQuery(query);
-            if(resul.rowInserted()){
-                JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso! :)");
-            } else {
-                JOptionPane.showMessageDialog(null, "Algo de errado aconteceu! :(");
-            }
+            int resulUpdate = statement.executeUpdate(query); // executeQuery para select e executeUpdate para todos os outros metodos do CRUD
+            JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso! :)");
+            System.out.println(resulUpdate);
             statement.close();
             conexao.close();
         } catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Algo de errado aconteceu! :(");
             System.err.println(e);
         }
     }
