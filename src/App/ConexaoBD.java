@@ -40,7 +40,6 @@ public class ConexaoBD {
             String query = "INSERT INTO USUARIOS(COD_USUARIO, NOME, EMAIL, SENHA) VALUES (" + contadorUser + "," + "'" + nomeInput + "'" +  "," + "'" + emailInput + "'" + "," + "'" + senhaInput + "'" + ")";
             int resulUpdate = statement.executeUpdate(query); // executeQuery para select e executeUpdate para todos os outros metodos do CRUD
             JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso! :)");
-            System.out.println(resulUpdate);
             statement.close();
             conexao.close();
         } catch(Exception e){

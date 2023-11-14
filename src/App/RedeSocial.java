@@ -22,6 +22,10 @@ public class RedeSocial {
     private static final JButton btnCadastrar = new JButton("Cadastrar");
     private static final JButton btnEfetuarCadastro = new JButton("Efetuar Cadastro");
     private static final JButton btnLogin = new JButton("Login");
+    private static final JLabel lblTelaInicial = new JLabel("Bem vindo a Rede Social!");
+    private static final JButton btnIncluirAmigo = new JButton("Incluir Amigo");
+    private static final JButton btnConsultarAmigo = new JButton("Consultar Amigos");
+    private static final JButton btnRemoverAmigo = new JButton("Remover Amigo");
 
     public RedeSocial() {
         frame.setSize(400, 400);
@@ -41,6 +45,9 @@ public class RedeSocial {
         btnCadastrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                inputLogin.setText("");
+                inputSenha.setText("");
+                inputNome.setText("");
                 frame2.setSize(400, 400);
                 frame2.add(painel2);
                 painel2.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 20));
@@ -89,6 +96,7 @@ public class RedeSocial {
                         JOptionPane.showMessageDialog(null, "Usuário ou senha estão vazios! :(");
                     } else if (cnxBD.ObterResultado("nome").contains(emailLogin) && cnxBD.ObterResultado("senha").contains(senhaLogin)) {
                         JOptionPane.showMessageDialog(null, "Login Encontrado! :)");
+                        abrirTelaInicial();
                     } else {
                         JOptionPane.showMessageDialog(null, "Usuário ou senha incorreto! :(");
                     }
@@ -97,6 +105,15 @@ public class RedeSocial {
                 }
             }
         });
+    }
+
+    private void abrirTelaInicial() {
+        painel.removeAll();
+        painel.add(lblTelaInicial);
+        painel.add(btnIncluirAmigo);
+        painel.add(btnConsultarAmigo);
+        painel.add(btnRemoverAmigo);
+        painel.updateUI(); // update na tela para carregar os novos componentes
     }
 
     public static void main(String[] args) {
