@@ -1,5 +1,3 @@
-*Trabalho Final do 3o Período*
-
-Linguagens de Programação + Programação Orientada a Objetos
+*Trabalho Final do 3o Período - LP + POO*
 
 Projeto de Rede Social utilizando java junto ao sqlite.
