@@ -5,7 +5,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class ConexaoBD {
-        String url = "jdbc:sqlite:/Users/lucca.balona/IdeaProjects/RedeSocialFinal/src/bd/BD_RedeSocial";
+        String url = "jdbc:sqlite:/Users/Lucca Maliniak/IdeaProjects/RedeSocialFinal/src/bd/BD_RedeSocial";
         String usuario = "root";
         String senha = "";
         ResultSet resul;
@@ -26,6 +26,14 @@ public class ConexaoBD {
             System.err.println("Erro ocorrido: " + e);
             return retornoBD;
         }
+    }
+
+    public boolean consultaExistenciaUsuario(String nome) throws SQLException {
+        Connection conexao = DriverManager.getConnection(url, usuario, senha);
+        Statement statement = conexao.createStatement();
+        String query = "SELECT * FROM USUARIOS WHERE NOME = " + "'" + nome + "'";
+        ResultSet resultado = statement.executeQuery(query);
+        return resultado.next();
     }
 
     public void addUsuario(String nomeInput, String emailInput, String senhaInput) throws Exception {
