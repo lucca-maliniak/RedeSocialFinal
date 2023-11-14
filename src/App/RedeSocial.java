@@ -118,7 +118,6 @@ public class RedeSocial {
 
     public static void main(String[] args) {
         new RedeSocial();
-//        ConexaoBD ResultadoConexaoBD = new ConexaoBD();
     }
 }
 ;
