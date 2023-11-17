@@ -22,13 +22,16 @@ public class RedeSocial {
     private static final JLabel labelSenha = new JLabel("Senha:");
     private static final JPasswordField inputSenha = new JPasswordField(20);
     private static final JButton btnCadastrar = new JButton("Cadastrar");
+    private static final JButton btnEnviarMensagem = new JButton("Enviar Mensagem");
+    private static final JButton btnConsultarMensagem = new JButton("Consultar Mensagens");
     private static final JButton btnEfetuarCadastro = new JButton("Efetuar Cadastro");
     private static final JButton btnLogin = new JButton("Login");
     private static final JLabel lblTelaInicial = new JLabel("Bem vindo a Rede Social!");
     private static final JButton btnIncluirAmigo = new JButton("Incluir Amigo");
     private static final JButton btnConsultarAmigo = new JButton("Consultar Amigos");
     private static final JButton btnRemoverAmigo = new JButton("Remover Amigo");
-
+    String resultadoMensagem = "";
+    int codeUserAtual = 0;
     public RedeSocial() {
         frame.setSize(400, 400);
         frame.add(painel);
@@ -68,7 +71,12 @@ public class RedeSocial {
         btnEfetuarCadastro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ConexaoBD cnxBD = new ConexaoBD();
+                ConexaoBD cnxBD = null;
+                try {
+                    cnxBD = new ConexaoBD();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
                 String emailLogin = inputLogin.getText();
                 String senhaLogin = inputSenha.getText();
                 String nomeLogin = inputNome.getText();
@@ -76,7 +84,7 @@ public class RedeSocial {
                     if (emailLogin.isEmpty() || senhaLogin.isEmpty() || nomeLogin.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Preencha todos os campos!");
                     } else {
-                        cnxBD.addUsuario(nomeLogin, emailLogin, senhaLogin);
+                        codeUserAtual = cnxBD.addUsuario(nomeLogin, emailLogin, senhaLogin);
                         inputLogin.setText("");
                         inputSenha.setText("");
                         inputNome.setText("");
@@ -90,7 +98,12 @@ public class RedeSocial {
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ConexaoBD cnxBD = new ConexaoBD();
+                ConexaoBD cnxBD = null;
+                try {
+                    cnxBD = new ConexaoBD();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
                 String emailLogin = inputLogin.getText();
                 String senhaLogin = inputSenha.getText();
                 try {
@@ -98,6 +111,7 @@ public class RedeSocial {
                         JOptionPane.showMessageDialog(null, "Usuário ou senha estão vazios! :(");
                     } else if (cnxBD.ObterResultado("nome").contains(emailLogin) && cnxBD.ObterResultado("senha").contains(senhaLogin)) {
                         JOptionPane.showMessageDialog(null, "Login Encontrado! :)");
+                        codeUserAtual = cnxBD.consultarId(emailLogin);
                         TelaInicial();
                     } else {
                         JOptionPane.showMessageDialog(null, "Usuário ou senha incorreto! :(");
@@ -109,13 +123,15 @@ public class RedeSocial {
         });
     }
 
-    private void TelaInicial() {
+    private void TelaInicial() throws SQLException {
         ConexaoBD cnx = new ConexaoBD();
         ArrayList<String> amigos = new ArrayList<>();
         painel.removeAll();
         painel.add(lblTelaInicial);
         painel.add(btnIncluirAmigo);
         painel.add(btnConsultarAmigo);
+        painel.add(btnEnviarMensagem);
+        painel.add(btnConsultarMensagem);
         painel.add(btnRemoverAmigo);
         painel.updateUI(); // update na tela para carregar os novos componentes
 
@@ -157,16 +173,75 @@ public class RedeSocial {
             }
         });
 
+        btnEnviarMensagem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ConexaoBD conexao = null;
+                try {
+                    conexao = new ConexaoBD();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try{
+                    if(amigos.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Não foi encontrado nenhum amigo! :(");
+                    } else {
+                        String resultado = "";
+                        int i = 0;
+                        for(String amigo : amigos) {
+                            i = amigos.indexOf(amigo);
+                            resultado += ++i + "- " + amigo + "\n";
+                        }
+                        String amigoInput = JOptionPane.showInputDialog(resultado + "\nDigite o nome do amigo que deseja mandar a mensagem");
+                        if(amigos.contains(amigoInput)){
+                            int indexUserDestino = amigos.indexOf(amigoInput);
+                            String mensagem = JOptionPane.showInputDialog("Digite a mensagem");
+                            conexao.addMensagem(mensagem, ++indexUserDestino);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Amigo não encontrado!");
+                        }
+                    }
+                } catch (Exception err){
+                    JOptionPane.showMessageDialog(null, "Ocorreu um erro durante o processo do envio da mensagem! :( \n" + err);
+                }
+            }
+        });
+
+        btnConsultarMensagem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    resultadoMensagem = "";
+                    ConexaoBD conexao = new ConexaoBD();
+                    ArrayList<String> retorno = conexao.consultarMensagens(codeUserAtual);
+                    retorno.forEach(elem -> resultadoMensagem += (retorno.indexOf(elem)) + 1  + "- " + elem + "\n");
+                    JOptionPane.showMessageDialog(null, "Mensagens:\n" + resultadoMensagem);
+                } catch (Exception err) {
+                    JOptionPane.showMessageDialog(null, "Ocorreu um erro durante o processo do envio da mensagem! :( \n" + err);
+                }
+            }
+        });
+
         btnRemoverAmigo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String amigo = JOptionPane.showInputDialog("Digite o nome do amigo para remover: ");
-                    if (amigos.contains(amigo)) {
-                        amigos.remove(amigo);
-                        JOptionPane.showMessageDialog(null, "Usuário foi removido como amigo com sucesso! :)");
+                    if(amigos.isEmpty()){
+                        JOptionPane.showMessageDialog(null, "Não foi encontrado nenhum amigo! :(");
                     } else {
-                        JOptionPane.showMessageDialog(null, "Amigo não foi encontrado no sistema! :(");
+                        String resultado = "";
+                        int i = 0;
+                        for(String amigo : amigos) {
+                            i = amigos.indexOf(amigo);
+                            resultado += ++i + "- " + amigo + "\n";
+                        }
+                        String amigo = JOptionPane.showInputDialog(resultado + "\nDigite o nome do amigo para remover: ");
+                        if (amigos.contains(amigo)) {
+                            amigos.remove(amigo);
+                            JOptionPane.showMessageDialog(null, "Usuário foi removido como amigo com sucesso! :)");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Amigo não foi encontrado no sistema! :(");
+                        }
                     }
                 } catch (Exception err) {
                     JOptionPane.showMessageDialog(null, "Ocorreu um erro! :( \n" + err);
