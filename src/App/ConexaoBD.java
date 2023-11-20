@@ -4,8 +4,12 @@ import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * Classe de conexão com o banco de dados
+ * @author Lucca Maliniak
+ */
 public class ConexaoBD {
-    String url = "jdbc:sqlite:/Users/Lucca Maliniak/IdeaProjects/RedeSocialFinal/src/bd/BD_RedeSocial";
+    String url = "jdbc:sqlite:/Users/lucca.balona/IdeaProjects/RedeSocialFinal/src/bd/BD_RedeSocial";
     String usuario = "root";
     String senha = "";
     ResultSet resul;
@@ -74,7 +78,7 @@ public class ConexaoBD {
             if (resulUpdate == 1) JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso! :)");
             return contadorUser;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Algo de errado aconteceu! :(");
+            JOptionPane.showMessageDialog(null, "Algo de errado aconteceu! :( \n" + e);
             return 0;
         } finally {
             if (conexao != null) {
