@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * @author Lucca Maliniak
  */
 public class ConexaoBD {
-    String url = "jdbc:sqlite:/Users/lucca.balona/IdeaProjects/RedeSocialFinal/src/bd/BD_RedeSocial";
+    String url = "jdbc:sqlite:/Users/Lucca Maliniak/IdeaProjects/RedeSocialFinal/src/bd/BD_RedeSocial";
     String usuario = "root";
     String senha = "";
     ResultSet resul;
@@ -103,11 +103,11 @@ public class ConexaoBD {
         }
     }
 
-    public ArrayList<String> consultarMensagens(int indexUser) throws SQLException {
+    public ArrayList<String> consultarMensagens(String userDestino) throws SQLException {
         try {
             conexao = DriverManager.getConnection(url, usuario, senha);
             statement = conexao.createStatement();
-            String query = "SELECT DESC_MSG FROM MENSAGEM WHERE FK_USER = " + indexUser;
+            String query = "SELECT DESC_MSG FROM MENSAGEM WHERE DESC_USERDESTINO = " + "'" + userDestino + "'";
             ResultSet resultado = statement.executeQuery(query);
             retornoBD2.clear();
             while (resultado.next()) {
@@ -129,14 +129,14 @@ public class ConexaoBD {
 
 
 
-    public void addMensagem(String mensagem, Integer indexUserDestino) {
+    public void addMensagem(String mensagem, String userDestino) {
         try {
             conexao = DriverManager.getConnection(url, usuario, senha);
             statement = conexao.createStatement();
             String queryMax = "SELECT MAX(COD_MSG) FROM MENSAGEM";
             ResultSet resultSet = statement.executeQuery(queryMax);
             int contadorMsg = resultSet.getInt(1) + 1;
-            String query = "INSERT INTO MENSAGEM(COD_MSG, DESC_MSG, FK_USER) VALUES (" + contadorMsg + "," + "'" + mensagem + "'" + "," + indexUserDestino + ")";
+            String query = "INSERT INTO MENSAGEM(COD_MSG, DESC_MSG, DESC_USERDESTINO) VALUES (" + contadorMsg + "," + "'" + mensagem + "'" + "," + "'" + userDestino + "'" + ")";
             int resulUpdate = statement.executeUpdate(query);
             if (resulUpdate == 1) JOptionPane.showMessageDialog(null, "Mensagem enviada com sucesso! :)");
         } catch (Exception e) {
@@ -164,7 +164,7 @@ public class ConexaoBD {
         try {
             conexao = DriverManager.getConnection(url, usuario, senha);
             statement = conexao.createStatement();
-            String query = "SELECT COD_USUARIO FROM USUARIOS WHERE NOME = '" + nome + "'";
+            String query = "SELECT COD_USUARIO FROM USUARIOS WHERE NOME = " +  "'" + nome + "'";
             ResultSet resultado = statement.executeQuery(query);
             int id = 0;
             if (resultado.next()) {

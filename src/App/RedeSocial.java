@@ -42,6 +42,7 @@ public class RedeSocial {
     private static final JButton btnDeslogar = new JButton("Sair");
     String resultadoMensagem = "";
     int codeUserAtual = 0;
+    String nameUserAtual;
 
     public RedeSocial() {
         inputLogin.setText("");
@@ -131,6 +132,7 @@ public class RedeSocial {
                     } else if (cnxBD.ObterResultado("nome").contains(emailLogin) && cnxBD.ObterResultado("senha").contains(senhaLogin)) {
                         JOptionPane.showMessageDialog(null, "Login Encontrado! :)");
                         codeUserAtual = cnxBD.consultarId(emailLogin);
+                        nameUserAtual = emailLogin;
                         System.out.println(codeUserAtual);
                         TelaInicial();
                     } else {
@@ -160,9 +162,9 @@ public class RedeSocial {
         painel.add(lblTelaInicial);
         painel.add(btnIncluirAmigo);
         painel.add(btnConsultarAmigo);
+        painel.add(btnRemoverAmigo);
         painel.add(btnEnviarMensagem);
         painel.add(btnConsultarMensagem);
-        painel.add(btnRemoverAmigo);
         painel.add(btnDeslogar);
         painel.updateUI(); // update na tela para carregar os novos componentes
 
@@ -229,9 +231,8 @@ public class RedeSocial {
                         }
                         String amigoInput = JOptionPane.showInputDialog(resultado + "\nDigite o nome do amigo que deseja mandar a mensagem");
                         if (amigos.contains(amigoInput)) {
-                            int indexUserDestino = amigos.indexOf(amigoInput);
                             String mensagem = JOptionPane.showInputDialog("Digite a mensagem");
-                            conexao.addMensagem(mensagem, ++indexUserDestino);
+                            conexao.addMensagem(mensagem, amigoInput);
                         } else {
                             JOptionPane.showMessageDialog(null, "Amigo não encontrado!");
                         }
@@ -248,7 +249,7 @@ public class RedeSocial {
                 try {
                     resultadoMensagem = "";
                     ConexaoBD conexao = new ConexaoBD();
-                    ArrayList<String> retorno = conexao.consultarMensagens(codeUserAtual);
+                    ArrayList<String> retorno = conexao.consultarMensagens(nameUserAtual);
                     if(retorno.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Não foi encontrada nenhuma mensagem!");
                     } else {
