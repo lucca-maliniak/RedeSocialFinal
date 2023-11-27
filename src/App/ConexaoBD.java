@@ -90,6 +90,18 @@ public class ConexaoBD {
         }
     }
 
+    public ResultSet selectUser(){
+        try{
+            conexao = DriverManager.getConnection(url, usuario, senha);
+            statement = conexao.createStatement();
+            String query = "SELECT * FROM USUARIOS";
+            ResultSet resultado = statement.executeQuery(query);
+            return resultado;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
 
     public ArrayList<String> consultarMensagens(int indexUser) throws SQLException {
         try {

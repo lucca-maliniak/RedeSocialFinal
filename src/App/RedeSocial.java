@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Array;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -18,8 +20,8 @@ public class RedeSocial {
     private static final JPanel painel2 = new JPanel();
     private static final JLabel textoLogin = new JLabel("Digite sua conta!");
     private static final JLabel textoCadastrar = new JLabel("Cadastre-se");
+    private static final JLabel labelEmail = new JLabel("Email:");
     private static final JLabel labelLogin = new JLabel("Login:");
-    private static final JLabel labelNome = new JLabel("Nome:");
     private static final JTextField inputLogin = new JTextField(20);
     private static final JTextField inputLogin2 = new JTextField(20);
     private static final JTextField inputNome = new JTextField(20);
@@ -36,10 +38,13 @@ public class RedeSocial {
     private static final JButton btnIncluirAmigo = new JButton("Incluir Amigo");
     private static final JButton btnConsultarAmigo = new JButton("Consultar Amigos");
     private static final JButton btnRemoverAmigo = new JButton("Remover Amigo");
+    private static final JButton btnDeslogar = new JButton("Sair");
     String resultadoMensagem = "";
     int codeUserAtual = 0;
 
     public RedeSocial() {
+        inputLogin.setText("");
+        inputSenha.setText("");
         frame.setSize(400, 400);
         frame.add(painel);
         painel.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 20));
@@ -54,7 +59,10 @@ public class RedeSocial {
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        telaLogin();
+    }
 
+    private void telaLogin() {
         btnCadastrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -65,9 +73,9 @@ public class RedeSocial {
                 painel2.setLayout(new FlowLayout(FlowLayout.CENTER, 150, 20));
                 painel2.setBackground(new Color(255, 255, 255));
                 painel2.add(textoCadastrar);
-                painel2.add(labelNome);
-                painel2.add(inputNome2);
                 painel2.add(labelLogin);
+                painel2.add(inputNome2);
+                painel2.add(labelEmail);
                 painel2.add(inputLogin2);
                 painel2.add(labelSenha);
                 painel2.add(inputSenha2);
@@ -122,6 +130,7 @@ public class RedeSocial {
                     } else if (cnxBD.ObterResultado("nome").contains(emailLogin) && cnxBD.ObterResultado("senha").contains(senhaLogin)) {
                         JOptionPane.showMessageDialog(null, "Login Encontrado! :)");
                         codeUserAtual = cnxBD.consultarId(emailLogin);
+                        System.out.println(codeUserAtual);
                         TelaInicial();
                     } else {
                         JOptionPane.showMessageDialog(null, "Usuário ou senha incorreto! :(");
@@ -135,6 +144,16 @@ public class RedeSocial {
 
     private void TelaInicial() throws SQLException {
         ConexaoBD cnx = new ConexaoBD();
+        ResultSet resultado = cnx.selectUser();
+        ArrayList<String> nomesList = new ArrayList<>();
+        while (resultado.next()) {
+            String nome = resultado.getString("nome");
+            nomesList.add(nome);
+        }
+        String[] nomes = nomesList.toArray(new String[0]);
+        int index = codeUserAtual;
+
+        lblTelaInicial.setText("Bem vindo " + nomes[--index] + " :)");
         ArrayList<String> amigos = new ArrayList<>();
         painel.removeAll();
         painel.add(lblTelaInicial);
@@ -143,6 +162,7 @@ public class RedeSocial {
         painel.add(btnEnviarMensagem);
         painel.add(btnConsultarMensagem);
         painel.add(btnRemoverAmigo);
+        painel.add(btnDeslogar);
         painel.updateUI(); // update na tela para carregar os novos componentes
 
         btnIncluirAmigo.addActionListener(new ActionListener() {
@@ -150,9 +170,13 @@ public class RedeSocial {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String amigo = JOptionPane.showInputDialog("Digite o nome do amigo para adicionar: ");
-                    if (cnx.consultaExistenciaUsuario(amigo)) {
+                    var USER_EXIST = cnx.consultaExistenciaUsuario(amigo);
+                    var CODE_USER = cnx.consultarId(amigo);
+                    if (USER_EXIST && codeUserAtual != CODE_USER) {
                         amigos.add(amigo);
                         JOptionPane.showMessageDialog(null, "Usuário foi adicionado como amigo com sucesso! :)");
+                    } else if (codeUserAtual == CODE_USER){
+                        JOptionPane.showMessageDialog(null, "Não é possível adicionar a si mesmo! :(");
                     } else {
                         JOptionPane.showMessageDialog(null, "Usuário não foi encontrado no sistema! :(");
                     }
@@ -236,6 +260,14 @@ public class RedeSocial {
             }
         });
 
+        btnDeslogar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Deslogando...");
+                frame.dispose();
+            }
+        });
+
         btnRemoverAmigo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -262,8 +294,6 @@ public class RedeSocial {
                 }
             }
         });
-
-
     }
 
 
