@@ -20,6 +20,7 @@ public class RedeSocial {
     private static final JPanel painel2 = new JPanel();
     private static final JLabel textoLogin = new JLabel("Digite sua conta!");
     private static final JLabel textoCadastrar = new JLabel("Cadastre-se");
+    //k
     private static final JLabel labelEmail = new JLabel("Email:");
     private static final JLabel labelLogin = new JLabel("Login:");
     private static final JTextField inputLogin = new JTextField(20);
